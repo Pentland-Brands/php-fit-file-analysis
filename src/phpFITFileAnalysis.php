@@ -1,5 +1,5 @@
 <?php
-namespace robthompsonweb;
+namespace adriangibbons;
 
 /**
  * phpFITFileAnalysis
