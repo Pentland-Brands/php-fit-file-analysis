@@ -1,5 +1,5 @@
 <?php
-namespace adriangibbons;
+namespace robthompsonweb;
 
 /**
  * phpFITFileAnalysis
@@ -356,6 +356,9 @@ class phpFITFileAnalysis
             8 => 'hrm_run_single_byte_product_id',
             9 => 'bsm',
             10 => 'bcm',
+            11 => 'AXS01 HRM Bike Chipset model for ANT+ messaging',  //axs01
+            12 => 'hrm_tri model for HRM ANT+ messaging', //hrm_tri_single_byte_product_id
+            14 => 'fr225 model for HRM ANT+ messaging', //fr225_single_byte_product_id
             473 => 'Forerunner 301',            // 'fr301_china',
             474 => 'Forerunner 301',            // 'fr301_japan',
             475 => 'Forerunner 301',            // 'fr301_korea',
@@ -407,7 +410,9 @@ class phpFITFileAnalysis
             1735 => 'virb_elite',
             1736 => 'edge_touring',
             1742 => 'Edge 510',                 // 'edge510_japan',
+            1743 => 'hrm_tri',                 // 'hrm_tri',
             1752 => 'hrm_run',
+            1765 => 'Garmin Forerunner 920XT', //fr920xt
             1821 => 'Edge 510',                 // 'edge510_asia',
             1822 => 'Edge 810',                 // 'edge810_china',
             1823 => 'Edge 810',                 // 'edge810_taiwan',
@@ -416,11 +421,14 @@ class phpFITFileAnalysis
             1853 => 'virb_remote',
             1885 => 'vivo_ki',
             1903 => 'Forerunner 15',            // 'fr15',
+            1907 => 'vivo_active',              // 'vivo_active',
             1918 => 'Edge 510',                 // 'edge510_korea',
             1928 => 'Forerunner 620',           // 'fr620_japan',
             1929 => 'Forerunner 620',           // 'fr620_china',
             1930 => 'Forerunner 220',           // 'fr220_japan',
             1931 => 'Forerunner 220',           // 'fr220_china',
+            1936 => 'Approach S6 Golf',  //approach_s6
+            1956 => 'vívosmart', //vivo_smart
             1967 => 'Fenix 2',                  // fenix2
             1988 => 'epix',
             2050 => 'Fenix 3',                  // fenix3
