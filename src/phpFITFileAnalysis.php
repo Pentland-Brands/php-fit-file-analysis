@@ -1654,17 +1654,20 @@ class phpFITFileAnalysis
      */
     public function manufacturer()
     {
-        $tmp = $this->enumData('manufacturer', $this->data_mesgs['device_info']['manufacturer']);
+        $manufacturer = isset($this->data_mesgs['device_info']['manufacturer']) ? $this->data_mesgs['device_info']['manufacturer'] : [];
+        $tmp = $this->enumData('manufacturer', $manufacturer);
         return is_array($tmp) ? $tmp[0] : $tmp;
     }
     public function product()
     {
-        $tmp = $this->enumData('product', $this->data_mesgs['device_info']['product']);
+        $product = isset($this->data_mesgs['device_info']['product']) ? $this->data_mesgs['device_info']['product'] : [];
+        $tmp = $this->enumData('product', $product);
         return is_array($tmp) ? $tmp[0] : $tmp;
     }
     public function sport()
     {
-        $tmp = $this->enumData('sport', $this->data_mesgs['session']['sport']);
+        $sport = isset($this->data_mesgs['device_info']['sport']) ? $this->data_mesgs['device_info']['sport'] : [];
+        $tmp = $this->enumData('sport', $sport);
         return is_array($tmp) ? $tmp[0] : $tmp;
     }
     
