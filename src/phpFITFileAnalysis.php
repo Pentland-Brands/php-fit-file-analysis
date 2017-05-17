@@ -1654,19 +1654,23 @@ class phpFITFileAnalysis
      */
     public function manufacturer()
     {
-        $manufacturer = isset($this->data_mesgs['device_info']['manufacturer']) ? $this->data_mesgs['device_info']['manufacturer'] : [];
+        $manufacturer = isset($this->data_mesgs['device_info']['manufacturer']) ? $this->data_mesgs['device_info']['manufacturer'] : null;
         $tmp = $this->enumData('manufacturer', $manufacturer);
         return is_array($tmp) ? $tmp[0] : $tmp;
     }
     public function product()
     {
-        $product = isset($this->data_mesgs['device_info']['product']) ? $this->data_mesgs['device_info']['product'] : [];
+        $product = isset($this->data_mesgs['device_info']['product']) ? $this->data_mesgs['device_info']['product'] : null;
         $tmp = $this->enumData('product', $product);
         return is_array($tmp) ? $tmp[0] : $tmp;
     }
-    public function sport()
+    public function sport() 
     {
-        $sport = isset($this->data_mesgs['device_info']['sport']) ? $this->data_mesgs['device_info']['sport'] : [];
+        $sport = isset($this->data_mesgs['device_info']['sport']) ? $this->data_mesgs['device_info']['sport'] : null;
+        //Try looking in the session info if its not here 
+        if(!$sport) {
+            $sport = isset($this->data_mesgs['session']['sport']) ? $this->data_mesgs['session']['sport'] : null;
+        }
         $tmp = $this->enumData('sport', $sport);
         return is_array($tmp) ? $tmp[0] : $tmp;
     }
