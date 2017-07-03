@@ -1162,7 +1162,7 @@ class phpFITFileAnalysis
         }
         
         if (strlen($this->file_contents) - $header_size - 2 !== $this->file_header['data_size']) {
-            throw new \Exception('phpFITFileAnalysis->readHeader(): file_header[\'data_size\'] does not seem correct!');
+            //throw new \Exception('phpFITFileAnalysis->readHeader(): file_header[\'data_size\'] does not seem correct!');
         }
     }
     
