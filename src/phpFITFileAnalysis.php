@@ -245,6 +245,7 @@ class phpFITFileAnalysis
         ],
         'length_type' => [0 => 'idle', 1 => 'active'],
         'manufacturer' => [  // Have capitalised select manufacturers
+            0 => 'Samsung',
             1 => 'Garmin',
             2 => 'garmin_fr405_antfs',
             3 => 'zephyr',
@@ -359,7 +360,7 @@ class phpFITFileAnalysis
             5 => 'hrm2ss',
             6 => 'dsi_alf02',
             7 => 'hrm3ss',
-            8 => 'hrm_run_single_byte_product_id',
+            8 => 'Gear Fit2',
             9 => 'bsm',
             10 => 'bcm',
             11 => 'axs01',
