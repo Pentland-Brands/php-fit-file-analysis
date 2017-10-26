@@ -358,7 +358,7 @@ class phpFITFileAnalysis
             3 => 'axb01',
             4 => 'axb02',
             5 => 'hrm2ss',
-            6 => 'dsi_alf02',
+            6 => 'Gear Sport',
             7 => 'hrm3ss',
             8 => 'Gear Fit2',
             9 => 'bsm',
