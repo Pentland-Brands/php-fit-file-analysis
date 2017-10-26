@@ -39,7 +39,6 @@ class phpFITFileAnalysis
 {
     public $data_mesgs = [];  // Used to store the data read from the file in associative arrays.
     private $dev_field_descriptions = [];
-    private $field_descriptions = [];
     
     private $options = null;                 // Options provided to __construct().
     private $file_contents = '';             // FIT file is read-in to memory as a string, split into an array, and reversed. See __construct().
@@ -2040,12 +2039,10 @@ class phpFITFileAnalysis
             $count = count($thresholds);
             for ($key; $key<$count; ++$key) {
                 if ($value < $thresholds[$key]) {
-                    $result[$key]++;
-                    goto loop_end;
+                    break;
                 }
             }
             $result[$key]++;
-            loop_end:
         }
         
         array_unshift($thresholds, 0);
