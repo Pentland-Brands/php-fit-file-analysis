@@ -39,7 +39,6 @@ class phpFITFileAnalysis
 {
     public $data_mesgs = [];  // Used to store the data read from the file in associative arrays.
     private $dev_field_descriptions = [];
-    
     private $options = null;                 // Options provided to __construct().
     private $file_contents = '';             // FIT file is read-in to memory as a string, split into an array, and reversed. See __construct().
     private $file_pointer = 0;               // Points to the location in the file that shall be read next.
@@ -587,42 +586,42 @@ class phpFITFileAnalysis
      */
     private $endianness = [
         0 => [  // Little Endianness
-            0   => 'Ctmp',  // enum
-            1   => 'ctmp',  // sint8
-            2   => 'Ctmp',  // uint8
-            131 => 'vtmp',  // sint16 - manually convert uint16 to sint16 in fixData()
-            132 => 'vtmp',  // uint16
-            133 => 'Vtmp',  // sint32 - manually convert uint32 to sint32 in fixData()
-            134 => 'Vtmp',  // uint32
-            7   => 'a*tmp', // string
-            136 => 'ftmp',  // float32
-            137 => 'dtmp',  // float64
-            10  => 'Ctmp',  // uint8z
-            139 => 'vtmp',  // uint16z
-            140 => 'Vtmp',  // uint32z
-            13  => 'Ctmp',  // byte
-            142 => 'Ptmp',  // sint64 - manually convert uint64 to sint64 in fixData()
-            143 => 'Ptmp',  // uint64
-            144 => 'Ptmp'   // uint64z
+            0   => ['format' => 'Ctmp', 'bytes' => 1],  // enum
+            1   => ['format' => 'ctmp', 'bytes' => 1],  // sint8
+            2   => ['format' => 'Ctmp', 'bytes' => 1],  // uint8
+            131 => ['format' => 'vtmp', 'bytes' => 2],  // sint16 - manually convert uint16 to sint16 in fixData()
+            132 => ['format' => 'vtmp', 'bytes' => 2],  // uint16
+            133 => ['format' => 'Vtmp', 'bytes' => 4],  // sint32 - manually convert uint32 to sint32 in fixData()
+            134 => ['format' => 'Vtmp', 'bytes' => 4],  // uint32
+            7   => ['format' => 'a*tmp', 'bytes' => 1], // string
+            136 => ['format' => 'ftmp', 'bytes' => 4],  // float32
+            137 => ['format' => 'dtmp', 'bytes' => 8],  // float64
+            10  => ['format' => 'Ctmp', 'bytes' => 1],  // uint8z
+            139 => ['format' => 'vtmp', 'bytes' => 2],  // uint16z
+            140 => ['format' => 'Vtmp', 'bytes' => 4],  // uint32z
+            13  => ['format' => 'Ctmp', 'bytes' => 1],  // byte
+            142 => ['format' => 'Ptmp', 'bytes' => 8],  // sint64 - manually convert uint64 to sint64 in fixData()
+            143 => ['format' => 'Ptmp', 'bytes' => 8],  // uint64
+            144 => ['format' => 'Ptmp', 'bytes' => 8]   // uint64z
         ],
         1 => [  // Big Endianness
-            0   => 'Ctmp',  // enum
-            1   => 'ctmp',  // sint8
-            2   => 'Ctmp',  // uint8
-            131 => 'ntmp',  // sint16 - manually convert uint16 to sint16 in fixData()
-            132 => 'ntmp',  // uint16
-            133 => 'Ntmp',  // sint32 - manually convert uint32 to sint32 in fixData()
-            134 => 'Ntmp',  // uint32
-            7   => 'a*tmp', // string
-            136 => 'ftmp',  // float32
-            137 => 'dtmp',  // float64
-            10  => 'Ctmp',  // uint8z
-            139 => 'ntmp',  // uint16z
-            140 => 'Ntmp',  // uint32z
-            13  => 'Ctmp',  // byte
-            142 => 'Jtmp',  // sint64 - manually convert uint64 to sint64 in fixData()
-            143 => 'Jtmp',  // uint64
-            144 => 'Jtmp'   // uint64z
+            0   => ['format' => 'Ctmp', 'bytes' => 1],  // enum
+            1   => ['format' => 'ctmp', 'bytes' => 1],  // sint8
+            2   => ['format' => 'Ctmp', 'bytes' => 1],  // uint8
+            131 => ['format' => 'ntmp', 'bytes' => 1],  // sint16 - manually convert uint16 to sint16 in fixData()
+            132 => ['format' => 'ntmp', 'bytes' => 1],  // uint16
+            133 => ['format' => 'Ntmp', 'bytes' => 1],  // sint32 - manually convert uint32 to sint32 in fixData()
+            134 => ['format' => 'Ntmp', 'bytes' => 1],  // uint32
+            7   => ['format' => 'a*tmp', 'bytes' => 1], // string
+            136 => ['format' => 'ftmp', 'bytes' => 1],  // float32
+            137 => ['format' => 'dtmp', 'bytes' => 1],  // float64
+            10  => ['format' => 'Ctmp', 'bytes' => 1],  // uint8z
+            139 => ['format' => 'ntmp', 'bytes' => 1],  // uint16z
+            140 => ['format' => 'Ntmp', 'bytes' => 1],  // uint32z
+            13  => ['format' => 'Ctmp', 'bytes' => 1],  // byte
+            142 => ['format' => 'Jtmp', 'bytes' => 1],  // sint64 - manually convert uint64 to sint64 in fixData()
+            143 => ['format' => 'Jtmp', 'bytes' => 1],  // uint64
+            144 => ['format' => 'Jtmp', 'bytes' => 1]   // uint64z
         ]
     ];
     
@@ -997,6 +996,19 @@ class phpFITFileAnalysis
             ]
         ],
         
+        // 'event_timestamp' and 'event_timestamp_12' should have scale of 1024 but due to floating point rounding errors.
+        // These are manually divided by 1024 later in the processHrMessages() function.
+        132 => [
+            'mesg_name' => 'hr', 'field_defns' => [
+                0 => ['field_name' => 'fractional_timestamp', 'scale' => 32768, 'offset' => 0, 'units' => 's'],
+                1 => ['field_name' => 'time256',              'scale' => 256,   'offset' => 0, 'units' => 's'],
+                6 => ['field_name' => 'filtered_bpm',         'scale' => 1,     'offset' => 0, 'units' => 'bpm'],
+                9 => ['field_name' => 'event_timestamp',      'scale' => 1,     'offset' => 0, 'units' => 's'],
+                10 => ['field_name' => 'event_timestamp_12',  'scale' => 1,     'offset' => 0, 'units' => 's'],
+                253 => ['field_name' => 'timestamp',          'scale' => 1,     'offset' => 0, 'units' => 's']
+            ]
+        ],
+        
         142 => [
             'mesg_name' => 'segment_lap', 'field_defns' => [
                 0 => ['field_name' => 'event',                           'scale' => 1,         'offset' => 0, 'units' => ''],
@@ -1125,6 +1137,9 @@ class phpFITFileAnalysis
         $this->readDataRecords();
         $this->oneElementArrays();
         
+        // Process HR messages
+        $this->processHrMessages();
+        
         // Handle options.
         $this->fixData($this->options);
         $this->setUnits($this->options);
@@ -1162,7 +1177,8 @@ class phpFITFileAnalysis
         }
         
         if (strlen($this->file_contents) - $header_size - 2 !== $this->file_header['data_size']) {
-            //throw new \Exception('phpFITFileAnalysis->readHeader(): file_header[\'data_size\'] does not seem correct!');
+            // Overwrite the data_size. Seems to be incorrect if there are buffered messages e.g. HR records.
+            $this->file_header['data_size'] = $this->file_header['crc'] - $header_size + 2;
         }
     }
     
@@ -1216,7 +1232,7 @@ class phpFITFileAnalysis
                     
                     $global_mesg_num = ($architecture === 0) ? unpack('v1tmp', substr($this->file_contents, $this->file_pointer, 2))['tmp'] : unpack('n1tmp', substr($this->file_contents, $this->file_pointer, 2))['tmp'];
                     $this->file_pointer += 2;
-
+                    
                     $num_fields = ord(substr($this->file_contents, $this->file_pointer, 1));
                     $this->file_pointer++;
                     
@@ -1281,8 +1297,9 @@ class phpFITFileAnalysis
                             // Check that we have information on the Field Definition and a valid base type exists.
                             if (isset($this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]) && isset($this->types[$field_defn['base_type']])) {
                                 // Check if it's an invalid value for the type
-                                $tmp_value = unpack($this->types[$field_defn['base_type']], substr($this->file_contents, $this->file_pointer, $field_defn['size']))['tmp'];
-                                if ($tmp_value !== $this->invalid_values[$field_defn['base_type']]) {
+                                $tmp_value = unpack($this->types[$field_defn['base_type']]['format'], substr($this->file_contents, $this->file_pointer, $field_defn['size']))['tmp'];
+                                if ($tmp_value !== $this->invalid_values[$field_defn['base_type']] ||
+                                   $this->defn_mesgs[$local_mesg_type]['global_mesg_num'] === 132) {
                                     // If it's a timestamp, compensate between different in FIT and Unix timestamp epochs
                                     if ($field_defn['field_definition_number'] === 253 && !$this->garmin_timestamps) {
                                         $tmp_value += FIT_UNIX_TS_DIFF;
@@ -1291,13 +1308,23 @@ class phpFITFileAnalysis
                                     // If it's a Record data message, store all the pieces in the temporary array as the timestamp may not be first...
                                     if ($this->defn_mesgs[$local_mesg_type]['global_mesg_num'] === 20) {
                                         $tmp_record_array[$this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['field_name']] = $tmp_value / $this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['scale'] - $this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['offset'];
-                                    } elseif ($this->defn_mesgs[$local_mesg_type]['global_mesg_num'] === 206) {
+                                    } elseif ($this->defn_mesgs[$local_mesg_type]['global_mesg_num'] === 206) {  // Developer Data
                                         $tmp_record_array[$this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['field_name']] = $tmp_value;
                                     } else {
                                         if ($field_defn['base_type'] === 7) {  // Handle strings appropriately
                                             $this->data_mesgs[$this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['mesg_name']][$this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['field_name']][] = filter_var($tmp_value, FILTER_SANITIZE_STRING);
                                         } else {
-                                            $this->data_mesgs[$this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['mesg_name']][$this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['field_name']][] = $tmp_value / $this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['scale'] - $this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['offset'];
+                                            // Handle arrays
+                                            if ($field_defn['size'] !== $this->types[$field_defn['base_type']]['bytes']) {
+                                                $tmp_array = [];
+                                                $num_vals = $field_defn['size'] / $this->types[$field_defn['base_type']]['bytes'];
+                                                for ($i=0; $i<$num_vals; ++$i) {
+                                                    $tmp_array[] = unpack($this->types[$field_defn['base_type']]['format'], substr($this->file_contents, $this->file_pointer + ($i * $this->types[$field_defn['base_type']]['bytes']), $field_defn['size']))['tmp']/ $this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['scale'] - $this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['offset'];
+                                                }
+                                                $this->data_mesgs[$this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['mesg_name']][$this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['field_name']][] = $tmp_array;
+                                            } else {
+                                                $this->data_mesgs[$this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['mesg_name']][$this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['field_name']][] = $tmp_value / $this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['scale'] - $this->data_mesg_info[$this->defn_mesgs[$local_mesg_type]['global_mesg_num']]['field_defns'][$field_defn['field_definition_number']]['offset'];
+                                            }
                                         }
                                     }
                                 }
@@ -1325,7 +1352,7 @@ class phpFITFileAnalysis
                             $this->data_mesgs['developer_data'][$this->dev_field_descriptions[$field_defn['developer_data_index']][$field_defn['field_definition_number']]['field_name']]['units'] = $this->dev_field_descriptions[$field_defn['developer_data_index']][$field_defn['field_definition_number']]['units'];
                             
                             // Data
-                            $this->data_mesgs['developer_data'][$this->dev_field_descriptions[$field_defn['developer_data_index']][$field_defn['field_definition_number']]['field_name']]['data'][] = unpack($this->types[$this->dev_field_descriptions[$field_defn['developer_data_index']][$field_defn['field_definition_number']]['fit_base_type_id']], substr($this->file_contents, $this->file_pointer, $field_defn['size']))['tmp'];
+                            $this->data_mesgs['developer_data'][$this->dev_field_descriptions[$field_defn['developer_data_index']][$field_defn['field_definition_number']]['field_name']]['data'][] = unpack($this->types[$this->dev_field_descriptions[$field_defn['developer_data_index']][$field_defn['field_definition_number']]['fit_base_type_id']]['format'], substr($this->file_contents, $this->file_pointer, $field_defn['size']))['tmp'];
                             
                             $this->file_pointer += $field_defn['size'];
                         }
@@ -2596,10 +2623,11 @@ class phpFITFileAnalysis
         echo '<thead>';
         echo '<th>key</th>';
         echo '<th>PHP unpack() format</th>';
+        echo '<th>Bytes</th>';
         echo '</thead>';
         echo '<tbody>';
         foreach ($this->types as $key => $val) {
-            echo '<tr><td>'.$key.'</td><td>'.$val[0].'</td></tr>';
+            echo '<tr><td>'.$key.'</td><td>'.$val['format'].'</td><td>'.$val['bytes'].'</td></tr>';
         }
         echo '</tbody>';
         echo '</table>';
@@ -2649,6 +2677,88 @@ class phpFITFileAnalysis
                 echo '<tr><td>'.$field_key.'</td><td>'.count($field).'</td></tr>';
             }
             echo '</tbody></table><br><br>';
+        }
+    }
+    
+    /*
+     * Process HR messages
+     * 
+     * Based heavily on logic in commit:
+     * https://github.com/GoldenCheetah/GoldenCheetah/commit/957ae470999b9a57b5b8ec57e75512d4baede1ec
+     * Particularly the decodeHr() method
+     */
+    private function processHrMessages()
+    {
+        // Check that we have received HR messages
+        if (empty($this->data_mesgs['hr'])) {
+            return;
+        }
+        
+        $hr = [];
+        $timestamps = [];
+        
+        // Load all filtered_bpm values into the $hr array
+        foreach ($this->data_mesgs['hr']['filtered_bpm'] as $hr_val) {
+            if (is_array($hr_val)) {
+                foreach ($hr_val as $sub_hr_val) {
+                    $hr[] = $sub_hr_val;
+                }
+            } else {
+                $hr[] = $hr_val;
+            }
+        }
+        
+        // Manually scale timestamps (i.e. divide by 1024)
+        $last_event_timestamp = $this->data_mesgs['hr']['event_timestamp'];
+        $start_timestamp = $this->data_mesgs['hr']['timestamp'] - $last_event_timestamp / 1024.0;
+        $timestamps[] = $last_event_timestamp / 1024.0;
+        
+        // Determine timestamps (similar to compressed timestamps)
+        foreach ($this->data_mesgs['hr']['event_timestamp_12'] as $event_timestamp_12_val) {
+            $j=0;
+            for ($i=0; $i<11; $i++) {
+                $last_event_timestamp12 = $last_event_timestamp & 0xFFF;
+                $next_event_timestamp12;
+                
+                if ($j % 2 === 0) {
+                    $next_event_timestamp12 = $event_timestamp_12_val[$i] + (($event_timestamp_12_val[$i+1] & 0xF) << 8);
+                    $last_event_timestamp = ($last_event_timestamp & 0xFFFFF000) + $next_event_timestamp12;
+                } else {
+                    $next_event_timestamp12 = 16 * $event_timestamp_12_val[$i+1] + (($event_timestamp_12_val[$i] & 0xF0) >> 4);
+                    $last_event_timestamp = ($last_event_timestamp & 0xFFFFF000) + $next_event_timestamp12;
+                    $i++;
+                }
+                if ($next_event_timestamp12 < $last_event_timestamp12) {
+                    $last_event_timestamp += 0x1000;
+                }
+                
+                $timestamps[] = $last_event_timestamp / 1024.0;
+                $j++;
+            }
+        }
+        
+        // Map HR values to timestamps
+        $filtered_bpm_arr = [];
+        $secs = 0;
+        $min_record_ts = min($this->data_mesgs['record']['timestamp']);
+        $max_record_ts = max($this->data_mesgs['record']['timestamp']);
+        foreach ($timestamps as $idx => $timestamp) {
+            $ts_secs = round($timestamp + $start_timestamp);
+            
+            // Skip timestamps outside of the range we're interested in
+            if ($ts_secs >= $min_record_ts && $ts_secs <= $max_record_ts) {
+                if (isset($filtered_bpm_arr[$ts_secs])) {
+                    $filtered_bpm_arr[$ts_secs][0] += $hr[$idx];
+                    $filtered_bpm_arr[$ts_secs][1]++;
+                } else {
+                    $filtered_bpm_arr[$ts_secs] = [$hr[$idx], 1];
+                }
+            }
+        }
+        
+        // Populate the heart_rate fields for record messages
+        foreach ($filtered_bpm_arr as $idx => $arr) {
+            $this->data_mesgs['record']['heart_rate'][$idx] = (int)round($arr[0] / $arr[1]);
         }
     }
 }
