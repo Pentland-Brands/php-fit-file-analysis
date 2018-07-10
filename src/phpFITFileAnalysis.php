@@ -1105,6 +1105,32 @@ class phpFITFileAnalysis
         ]
     ];
 
+    public static function getChainedFileArray($file_path, $options) {
+        $data = [];
+        for ($i = 0; $i < static::countChainedFiles($file_path); $i++) {
+            $options['chained_file'] = $i;
+            $data[] = new static($file_path, $options);
+        }
+        return $data;
+    }
+
+    public static function countChainedFiles($file_path) {
+        $files = 0;
+        $pointer = 0;
+        $data = file_get_contents($file_path);
+        while ($pointer < strlen($data)) {
+            $files++;
+            if (substr($data, $pointer+8, 4) != '.FIT') {
+                throw new \Exception('Invalid FIT file');
+            }
+            $header_length = unpack('C', substr($data, $pointer, 1))[1];
+            $body_length = unpack('V', substr($data, $pointer+4, 4))[1];
+            $pointer += $header_length + $body_length + 2;
+        }
+
+        return $files;
+    }
+
     // PHP Constructor - called when an object of the class is instantiated.
     public function __construct($file_path, $options = null)
     {
@@ -1131,9 +1157,22 @@ class phpFITFileAnalysis
           * Header . Data Records . CRC
           */
         $this->file_contents = file_get_contents($file_path);  // Read the entire file into a string
-        
-        // Process the file contents.
+
+        // Get the header data for this file
         $this->readHeader();
+
+        if (!empty($this->options['chained_file'])) {
+            // Page through the file to select the entry we want
+            while ($this->options['chained_file'] > 0) {
+                // Jump to the end of the file
+                //dd($this->file_header, strlen($this->file_contents));
+                $this->file_pointer += $this->file_header['data_size']+2;
+                $this->options['chained_file']--;
+                $this->readHeader(); // Read in the header for the next file
+            }
+        }
+
+        // Process the file contents.
         $this->readDataRecords();
         $this->oneElementArrays();
 
@@ -1176,10 +1215,6 @@ class phpFITFileAnalysis
             throw new \Exception('phpFITFileAnalysis->readHeader(): not a valid FIT file!');
         }
 
-        if (strlen($this->file_contents) - $header_size - 2 !== $this->file_header['data_size']) {
-            // Overwrite the data_size. Seems to be incorrect if there are buffered messages e.g. HR records.
-            $this->file_header['data_size'] = $this->file_header['crc'] - $header_size + 2;
-        }
     }
 
     /**
@@ -1194,6 +1229,15 @@ class phpFITFileAnalysis
         $previousTS = 0;
 
         while ($this->file_header['header_size'] + $this->file_header['data_size'] > $this->file_pointer) {
+            // Test to see if this is the header for the next file, in case of chained records
+            if (substr($this->file_contents, $this->file_pointer+10, 4) == '.FIT') {
+                if (!isset($this->options['chained_file'])) {
+                    // Did not know this file was chained, so we don't know which one to use
+                    throw new \Exception('Error: Chained file submitted, expecting single file.');
+                }
+                break; // treat this as an EOF
+            }
+
             $record_header_byte = ord(substr($this->file_contents, $this->file_pointer, 1));
             $this->file_pointer++;
 
