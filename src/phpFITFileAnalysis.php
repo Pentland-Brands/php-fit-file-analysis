@@ -2780,29 +2780,31 @@ class phpFITFileAnalysis
                 $j++;
             }
         }
-        
-        // Map HR values to timestamps
-        $filtered_bpm_arr = [];
-        $secs = 0;
-        $min_record_ts = min($this->data_mesgs['record']['timestamp']);
-        $max_record_ts = max($this->data_mesgs['record']['timestamp']);
-        foreach ($timestamps as $idx => $timestamp) {
-            $ts_secs = round($timestamp + $start_timestamp);
-            
-            // Skip timestamps outside of the range we're interested in
-            if ($ts_secs >= $min_record_ts && $ts_secs <= $max_record_ts) {
-                if (isset($filtered_bpm_arr[$ts_secs])) {
-                    $filtered_bpm_arr[$ts_secs][0] += $hr[$idx];
-                    $filtered_bpm_arr[$ts_secs][1]++;
-                } else {
-                    $filtered_bpm_arr[$ts_secs] = [$hr[$idx], 1];
+
+        if (!empty($this->data_mesgs['record'])) {
+            // Map HR values to timestamps
+            $filtered_bpm_arr = [];
+            $secs = 0;
+            $min_record_ts = min($this->data_mesgs['record']['timestamp']);
+            $max_record_ts = max($this->data_mesgs['record']['timestamp']);
+            foreach ($timestamps as $idx => $timestamp) {
+                $ts_secs = round($timestamp + $start_timestamp);
+
+                // Skip timestamps outside of the range we're interested in
+                if ($ts_secs >= $min_record_ts && $ts_secs <= $max_record_ts) {
+                    if (isset($filtered_bpm_arr[$ts_secs])) {
+                        $filtered_bpm_arr[$ts_secs][0] += $hr[$idx];
+                        $filtered_bpm_arr[$ts_secs][1]++;
+                    } else {
+                        $filtered_bpm_arr[$ts_secs] = [$hr[$idx], 1];
+                    }
                 }
             }
-        }
-        
-        // Populate the heart_rate fields for record messages
-        foreach ($filtered_bpm_arr as $idx => $arr) {
-            $this->data_mesgs['record']['heart_rate'][$idx] = (int)round($arr[0] / $arr[1]);
+
+            // Populate the heart_rate fields for record messages
+            foreach ($filtered_bpm_arr as $idx => $arr) {
+                $this->data_mesgs['record']['heart_rate'][$idx] = (int)round($arr[0] / $arr[1]);
+            }
         }
     }
 }
