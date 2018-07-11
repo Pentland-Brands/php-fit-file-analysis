@@ -1,5 +1,5 @@
 <?php
-namespace pantland-brands;
+namespace pentlandbrands;
 
 /**
  * phpFITFileAnalysis
