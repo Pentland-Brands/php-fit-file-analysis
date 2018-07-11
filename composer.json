@@ -11,7 +11,7 @@
     },
     "autoload": {
         "psr-4": {
-            "pentland-brands\\": "src/"
+            "pentlandbrands\\": "src/"
         }
     }
 }
